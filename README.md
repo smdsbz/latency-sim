@@ -162,11 +162,61 @@ __Example__
 Modular Design
 --------------
 
+```text
+EventLoop
+
+EventGenerator
+
+LatencySource
+  '-- ConstantSource
+  '-- SamplingSource
+  |     '-- NormalDistributionSource
+  |     '-- UniformDistributionSource
+  '-- StochasticProcessSource
+
+PerfCounter
+```
+
 #### Simulated Event Loop
+
+The event loop ticks by _events_ rather than _time_.
+
+It  would  be  easier to translate stochastic model into config files,  however,
+making it less intuitive to acquire time-related numbers, like through-put.
+
+For every tick, the event loop takes one event from the event generator.
+
+This   effectively  limits  the  range  of  models  the  tool  can  simulate  to
+_single-threaded serial_ events.  However,  certain synchronized parallel events
+can  be  modeled with operators like `maximum`,  where the lengthiest process of
+the batch dominates the section.
 
 #### Event Generator
 
+Generates an event every tick.  For example, for modeling I/O latency, events to
+be generated could be read events, write events, promotion events and so on. The
+framework  assumes that every events associates to some latency  (defined in the
+`sources`  section  in  the  config file),  otherwise we won't need to model the
+event since it doesn't contribute to the final output number.
+
 #### Performance Counter
+
+Sample some output numbers from event loop, and store them in some counters.
 
 Source Tree Organization
 ------------------------
+
+```text
+src/
+  '-- evloop/
+  '-- evgen/
+  |     '-- __init__.py
+  |     '-- event_generator.py
+  |     '-- latency_sources/
+  |           '-- __init__.py
+  |           '-- latency_source.py
+  |           '-- constant_sources.py
+  |           '-- sampling_sources.py
+  '-- perfcounter/
+  '-- test/                         // run with `python -m unittest test/xxx.py`
+```
