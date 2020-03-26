@@ -18,11 +18,11 @@ Intuition and Guidelines
       Perf Counter <-.
                      |
        .--> Simulated Event Loop --.
-       |                           |
-     (R/W)                         |
-       |                           |
-Event Generator                    |
-       ^                           |
+       |     ^                     |
+     (R/W)   '-------.             |
+       |             |             |
+Event Generator    State           |
+       ^         (Optional)        |
        |                           |
        '---------------------------'
 ```
@@ -35,7 +35,7 @@ tunables.
 
 __Schema__
 
-TODO
+TODO: fill me once it is stable, and in the mood :)
 
 __Example__
 
@@ -48,12 +48,10 @@ __Example__
   "sources": [
     {
       "name": "nvme-ssd-read",
-      "sample-operation": {
-        "type": "normal-distribution",
-        "parameters": {   // defined per `type`
-          "mu": 2000.0,
-          "sigma": 128.0
-        }
+      "type": "normal-distribution",
+      "parameters": {   // defined per `type`
+        "mu": 2000.0,
+        "sigma": 128.0
       }
     },
 
@@ -153,6 +151,14 @@ __Example__
         }
       ]
     },
+    {
+      "name": "read",
+      "type": "event",
+      "probability": 0.8,   // uniform scale, may not adds up to exactly 1
+      "workflow": [
+        // ...
+      ]
+    },
 
     // you get the idea...
   ],
@@ -208,6 +214,8 @@ Source Tree Organization
 
 ```text
 src/
+  '-- config/
+  |     '-- __init__.py
   '-- evloop/
   '-- evgen/
   |     '-- __init__.py
